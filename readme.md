@@ -36,3 +36,8 @@ Das Projekt eignet sich perfekt für **GitHub Pages**. Einfach in den Repo-Einst
 ├── index.html        # Hauptanwendung (Rechner)
 ├── erklärung.html    # Erklärungsseite (Theorie & Anleitung)
 └── README.md         # Projektbeschreibung
+```
+
+## 📝 Lizenz
+Dieses Projekt ist offen für alle. Fühle dich frei, es zu kopieren, zu verändern und zu nutzen.
+
