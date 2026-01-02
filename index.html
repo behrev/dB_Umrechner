@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dB Umrechner für Verstärkungen</title>
+    <style>
+        :root {
+            /* Light Mode Variables */
+            --bg-color: #f4f4f4;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --accent-color: #9cc2b7;
+            --accent-hover: #86a89e;
+            --border-color: #ddd;
+            --input-bg: #fff;
+            --header-line: #aaccce;
+            --shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .dark-mode {
+            /* Dark Mode Variables */
+            --bg-color: #1e1e1e;
+            --card-bg: #2d2d2d;
+            --text-color: #e0e0e0;
+            --accent-color: #5f7a73;
+            --accent-hover: #4e635d;
+            --border-color: #444;
+            --input-bg: #3a3a3a;
+            --header-line: #5f7a73;
+            --shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Header Bereich */
+        header {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 15px; /* Etwas mehr Abstand zwischen Button und Switch */
+            align-items: center;
+        }
+
+        .dummy-btn {
+            background-color: var(--accent-color);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            color: #fff;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        
+        .dummy-btn:hover {
+            opacity: 1;
+        }
+
+        h1 {
+            text-align: center;
+            width: 100%;
+            margin: 20px 0 40px 0;
+            font-size: 1.8rem;
+        }
+
+        /* Container für die 3 Karten */
+        .cards-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            padding: 30px 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            flex: 1;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .card-header {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            position: relative;
+            padding-bottom: 10px;
+            width: 100%;
+            text-align: center;
+            border-bottom: 2px solid var(--header-line);
+        }
+
+        .input-group {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 5px;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        select {
+            width: 80px;
+            cursor: pointer;
+        }
+
+        input:focus {
+            border-color: var(--accent-color);
+        }
+
+        /* Berechnen Button */
+        .calc-btn {
+            margin-top: 30px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            font-size: 1.1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            box-shadow: var(--shadow);
+        }
+
+        .calc-btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Ergebnis Leiste unten */
+        .result-bar {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 1100px;
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Dark Mode Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(23px);
+        }
+        
+        .note-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            resize: none;
+            font-family: inherit;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header Controls (rechts oben) -->
+    <header>
+        <div style="flex-grow: 1;"></div> <!-- Spacer schiebt alles nach rechts -->
+        <div class="header-controls">
+            
+            <a href="erklaerung.html" class="dummy-btn" style="text-decoration:none; display:inline-block; text-align:center;">Erklärung</a>
+            
+            <!-- Dark Mode Switch -->
+            <label class="switch" title="Dark Mode umschalten">
+                <input type="checkbox" id="darkModeToggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </header>
+
+    <h1>dB Umrechner für Verstärkungen</h1>
+
+    <div class="cards-container">
+        
+        <!-- Karte 1: Eingang -->
+        <div class="card">
+            <div class="card-header">Eingangssignal (P<sub>in</sub>)</div>
+            
+            <div class="input-group">
+                <label>Leistungswert:</label>
+                <div class="input-wrapper">
+                    <input type="number" id="inputPower" placeholder="0.00" step="any">
+                    <select id="inputUnit">
+                        <option value="mW">mW</option>
+                        <option value="W">Watt</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Notiz:</label>
+                <input type="text" class="note-input" placeholder="Quelle / Gerät">
+            </div>
+        </div>
+
+        <!-- Karte 2: Ausgang -->
+        <div class="card">
+            <div class="card-header">Ausgangssignal (P<sub>out</sub>)</div>
+            
+            <div class="input-group">
+                <label>Leistungswert:</label>
+                <div class="input-wrapper">
+                    <input type="number" id="outputPower" placeholder="0.00" step="any">
+                    <select id="outputUnit">
+                        <option value="mW">mW</option>
+                        <option value="W">Watt</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Notiz:</label>
+                <input type="text" class="note-input" placeholder="Ziel / Messpunkt">
+            </div>
+        </div>
+
+        <!-- Karte 3: Info / Formel -->
+        <div class="card">
+            <div class="card-header">Information</div>
+            
+            <div style="text-align: center; color: var(--text-color); margin-top: 10px;">
+                <p>Berechnet die Verstärkung (Gain) oder Dämpfung basierend auf dem Leistungsverhältnis.</p>
+                <br>
+                <p style="font-style: italic; opacity: 0.8;">Formel:</p>
+                <code style="background: var(--input-bg); padding: 5px; border-radius: 4px; border: 1px solid var(--border-color);">L = 10 · log₁₀(Pout / Pin)</code>
+            </div>
+        </div>
+
+    </div>
+
+    <button class="calc-btn" onclick="calculateDB()">Berechnen</button>
+
+    <div class="result-bar" id="resultDisplay">
+        Verstärkung in dB: -
+    </div>
+
+    <script>
+        // Dark Mode Logic
+        const toggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+
+        if(localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+            toggle.checked = true;
+        }
+
+        toggle.addEventListener('change', () => {
+            if(toggle.checked) {
+                body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Berechnungs-Logik
+        function calculateDB() {
+            const pInVal = parseFloat(document.getElementById('inputPower').value);
+            const pInUnit = document.getElementById('inputUnit').value;
+            
+            const pOutVal = parseFloat(document.getElementById('outputPower').value);
+            const pOutUnit = document.getElementById('outputUnit').value;
+            
+            const resultDisplay = document.getElementById('resultDisplay');
+
+            if (isNaN(pInVal) || isNaN(pOutVal)) {
+                resultDisplay.textContent = "Bitte geben Sie gültige Zahlen ein.";
+                resultDisplay.style.color = "#d9534f";
+                return;
+            }
+
+            if (pInVal <= 0 || pOutVal <= 0) {
+                resultDisplay.textContent = "Leistung muss größer als 0 sein (logarithmisch).";
+                resultDisplay.style.color = "#d9534f";
+                return;
+            }
+
+            // Normalisierung auf Watt
+            let pInWatts = (pInUnit === 'mW') ? pInVal / 1000 : pInVal;
+            let pOutWatts = (pOutUnit === 'mW') ? pOutVal / 1000 : pOutVal;
+
+            // Berechnung
+            const ratio = pOutWatts / pInWatts;
+            const db = 10 * Math.log10(ratio);
+
+            const dbFormatted = db.toFixed(2);
+            let text = "";
+            
+            if (db > 0) {
+                text = `Verstärkung: +${dbFormatted} dB (Faktor: ${ratio.toFixed(2)}x)`;
+                resultDisplay.style.color = "var(--text-color)";
+            } else if (db < 0) {
+                text = `Dämpfung: ${dbFormatted} dB (Faktor: ${ratio.toFixed(4)}x)`;
+                resultDisplay.style.color = "var(--text-color)";
+            } else {
+                text = `Keine Veränderung: 0 dB`;
+                resultDisplay.style.color = "var(--text-color)";
+            }
+
+            resultDisplay.textContent = text;
+        }
+    </script>
+</body>
+</html>
